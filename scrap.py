@@ -26,10 +26,10 @@ def feed(consume):
 
 data = []
 
-for i in range(0,2000,100):
+for i in range(100,2000,100):
     data.append([i,feed(i)])
 
-with open("data.txt",'r+') as data1:
+with open("data.txt",'a+') as data1:
         csvwriter = csv.writer(data1)
         for i in data:
             csvwriter.writerow(i)

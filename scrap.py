@@ -1,41 +1,35 @@
 from selenium import webdriver
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.common.action_chains import ActionChains
-from time import sleep
-import time
 from bs4 import BeautifulSoup
-import requests
-import csv
-  
+from time import sleep
+import csv,random
 
-#constants
-URL = "https://www.tnebnet.org/atm/tariffMaster"
 
 driver = webdriver.Firefox()
+def feed(consume):
+    driver.get("https://www.tnebnet.org/atm/tariffMaster")
+    unit_consume = driver.find_element_by_xpath('//*[@id="calculator:unit"]')
+    element = driver.find_element_by_xpath('//*[@id="calculator:tarifftype"]')
+    calc_button = driver.find_element_by_xpath('/html/body/div[1]/table/tbody/tr[4]/td/fieldset/div/table[2]/tbody/tr/td[2]/button/span')
+    action_in = ActionChains(driver)
+    select_object = Select(element)
+    select_object.select_by_value("DOMESTIC")
+    action_in.send_keys_to_element(unit_consume,consume)
+    action_in.click(on_element=calc_button)
+    action_in.perform()
+    sleep(3)
+    html = driver.page_source
+    soup = BeautifulSoup(html,'lxml')
+    a = soup.find_all("span")
+    return a[-4].text
 
-driver.get(URL)
+data = []
 
-unit_consume = driver.find_element_by_xpath('//*[@id="calculator:unit"]')
-element = driver.find_element_by_xpath('//*[@id="calculator:tarifftype"]')
-calc_button = driver.find_element_by_xpath('/html/body/div[1]/table/tbody/tr[4]/td/fieldset/div/table[2]/tbody/tr/td[2]/button/span')
-action = ActionChains(driver)
-select_object = Select(element)
-select_object.select_by_value("DOMESTIC")
-action.send_keys_to_element(unit_consume,500)
-action.click(on_element=calc_button)
-action.perform()
+for i in range(0,2000,100):
+    data.append([i,feed(i)])
 
-sleep(3)
-
-
-source = driver.page_source
-soup = BeautifulSoup(source,'lxml')
-
-panel_content = soup.find_all('span')
-rows = [panel_content[7].text,panel_content[-4].text]
-
-with open ('data.txt','r+') as csvfile:
-    csvwriter = csv.writer(csvfile)
-    csvwriter.writerow(rows)
-
-
+with open("data.txt",'r+') as data1:
+        csvwriter = csv.writer(data1)
+        for i in data:
+            csvwriter.writerow(i)

@@ -5,7 +5,8 @@ from time import sleep
 import time
 from bs4 import BeautifulSoup
 import requests
-
+  
+  
 #constants
 URL = "https://www.tnebnet.org/atm/tariffMaster"
 
